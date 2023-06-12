@@ -1,10 +1,13 @@
 import ListHeader from './components/ListHeader';
 import ListItem from './components/ListItem';
+import Auth from './components/Auth';
 import { useEffect, useState } from 'react';
 
 const App = () => {
   const userEmail = 'irina@test.com';
   const [tasks, setTasks] = useState(null);
+
+  const authToken = false;
 
   const getData = async () => {
     try {
@@ -16,7 +19,11 @@ const App = () => {
     } 
   }
 
-  useEffect(() => getData, []);
+  useEffect(() => {
+    if (authToken) {
+      getData();
+    }
+  }, [authToken]);
   console.log("tasks: ", tasks);
 
   // sort tasks by date 
@@ -24,8 +31,12 @@ const App = () => {
 
   return (
     <div className="app">
+      {!authToken && <Auth />}
+      {authToken && 
+      <>
       <ListHeader listName={'To do list'} getData={getData} />
       {sortedTasks?.map(task => <ListItem key={task.id} task={task} getData={getData} />)}
+      </>}
     </div>
   );
 }
