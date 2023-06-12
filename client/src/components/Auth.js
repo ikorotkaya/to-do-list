@@ -9,8 +9,6 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState(null);
   const [error, setError] = useState(null);
 
-  console.log(cookies)
-
   const viewLogIn = (status) => {
     setError(null);
     setIsLogIn(status);
@@ -22,30 +20,18 @@ const Auth = () => {
       setError("Make sure your passwords match!");
       return;
     }
-    let response;
-    try {
-      response = await fetch(`${process.env.REACT_APP_SERVERURL}/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-    } catch(err) {
-      console.error(err);
-    }
-    
-    let data;
-    try {
-      console.log(response)
-      data = await response.json();
-      console.log("data: ", data)
-    } catch(err) {
-      console.error(err);
-    }
+
+    const response = await fetch(`${process.env.REACT_APP_SERVERURL}/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
 
     // if there is an error, set the error state
     if (data.detail) {
-      setError(data.error);
-      console.log("error: ", data.error)
+      setError(data.detail);
     } else {
       // set the cookies 
       // Cookies are typically used for storing small pieces of data on the client-side. 

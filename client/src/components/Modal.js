@@ -52,7 +52,7 @@ const  Modal = ({mode, setShowModal, getData, task}) => {
 //  update the data state based on user input
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log("name: ", name, "value: ", value);
+    console.log(name, value);
 
     setData({
       ...data,

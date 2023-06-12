@@ -25,7 +25,6 @@ const App = () => {
       getData();
     }
   }, []);
-  console.log("tasks: ", tasks);
 
   // sort tasks by date 
   const sortedTasks = tasks?.sort((a,b) => new Date(a.date) - new Date(b.date));

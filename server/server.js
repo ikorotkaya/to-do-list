@@ -67,10 +67,10 @@ app.delete('/todos/:id', async (req, res) => {
 app.post('/signup', async (req, res) => {
   console.log("I received a signup request")
   const { email, password } = req.body;
-  console.log("email: ", email, "password: ", password)
+  
   // hash the password
   const salt = bcrypt.genSaltSync(10);
-  console.log("salt: ", salt)
+  
   const hashedPassword = bcrypt.hashSync(password, salt);
 
   try {
@@ -89,9 +89,23 @@ app.post('/signup', async (req, res) => {
 
 // login
 app.post('/login', async (req, res) => {
-  const { email, password} = req.body;
-  try {
+  const { email, password } = req.body;
 
+  try {
+    const users = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (!users.rows.length) {
+      return res.json({ detail: 'User does not exist!' })
+    } 
+
+    const token = jwt.sign({ email }, 'secret', { expiresIn: '1h' });
+    const success = await bcrypt.compare(password, users.rows[0].hashed_password);
+
+    if (success) {
+      res.json({'email' : users.rows[0].email, token})
+    } else {
+      res.json( {detail: "Login failed"} )
+    }
   } catch (err) {
     console.error(err.message)
   }
