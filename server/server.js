@@ -4,13 +4,11 @@ const { v4: uuidv4 } = require('uuid');
 const cors = require('cors')
 const app = express()
 const pool = require('./db')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 //get all todos
 app.get('/todos/:userEmail', async (req, res) => {
@@ -62,6 +60,40 @@ app.delete('/todos/:id', async (req, res) => {
     res.json(deleteToDo);
   } catch(err) {
    console.log(err)
+  }
+});
+
+// signup
+app.post('/signup', async (req, res) => {
+  console.log("I received a signup request")
+  const { email, password } = req.body;
+  console.log("email: ", email, "password: ", password)
+  // hash the password
+  const salt = bcrypt.genSaltSync(10);
+  console.log("salt: ", salt)
+  const hashedPassword = bcrypt.hashSync(password, salt);
+
+  try {
+    const signUp = await pool.query('INSERT INTO users (email, hashed_password) VALUES ($1, $2)', [email, hashedPassword]);
+
+    // create a token
+    const token = jwt.sign({ email }, 'secret', { expiresIn: '1h' });
+    // send back
+    res.json({email, token})
+
+  } catch (err) {
+    console.error(err)
+    res.json({detail: err.detail})
+  }
+});
+
+// login
+app.post('/login', async (req, res) => {
+  const { email, password} = req.body;
+  try {
+
+  } catch (err) {
+    console.error(err.message)
   }
 });
 
